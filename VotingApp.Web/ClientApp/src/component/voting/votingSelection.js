@@ -52,9 +52,9 @@ export function VotingSelection({ ...props }) {
               value={selectedVoterId}
               onChange={handleVoterSelectionChange}
             >
-              {props.voterData.map((row) => (
+              {props.voterData && (props.voterData.map((row) => (
                 <MenuItem value={row.id}>{row.name}</MenuItem>
-              ))}
+              )))}
             </Select>
           </FormControl>
         </Box>
@@ -71,9 +71,9 @@ export function VotingSelection({ ...props }) {
               value={selectedCandidateId}
               onChange={handleCandidateSelectionChange}
             >
-              {props.candidateData.map((row) => (
+              {props.candidateData && (props.candidateData.map((row) => (
                 <MenuItem value={row.id}>{row.name}</MenuItem>
-              ))}
+              )))}
             </Select>
           </FormControl>
         </Box>

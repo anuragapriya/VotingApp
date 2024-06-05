@@ -4,10 +4,12 @@ import { Voter } from "./voter";
 import { VotingSelection } from "./votingSelection";
 import Grid from "@mui/material/Grid";
 import Alert from "@mui/material/Alert";
+import { connect } from "react-redux";
+import  * as actionType from "../../redux/actions";
 
-export function VotingIndex() {
-    const [candidateData, saveCandidateData] = useState([]);
-    const [voterData, saveVoterData] = useState([]);
+const VotingIndex = (props) => {
+console.log(props);
+    const { voterData, candidateData,addedVoter,addedCandidate, addedVote,actions } = props;
 
     let availableVoters =
         voterData != undefined
@@ -25,31 +27,23 @@ export function VotingIndex() {
         availableVoters != undefined &&
         availableVoters.length > 0;
 
-    const fetchVoterData = async () => {
-        try {
-            const response = await fetch(`/api/voters/Get`);
-            const jsonData = await response.json();
-            console.log(jsonData);
-            saveVoterData(jsonData);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
-
-    const fetchCandidateData = async () => {
-        try {
-            const response = await fetch(`/api/candidates/Get`);
-            const jsonData = await response.json();
-            console.log(jsonData);
-            saveCandidateData(jsonData);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
     useEffect(() => {
-        fetchVoterData();
-        fetchCandidateData();
+         actions.getVoters();
+         actions.getCandidates();
     }, []);
+
+    useEffect(() => {
+        if (addedVoter) {
+            actions.getVoters();
+        } else if (addedCandidate) {
+            actions.getCandidates();
+        }
+        else if (addedVote) {
+             actions.getVoters();
+             actions.getCandidates();
+        }
+
+    }, [addedVoter, addedCandidate, addedVote])
 
     const onVoterSubmit = async (voterName) => {
         if (voterName) {
@@ -57,17 +51,7 @@ export function VotingIndex() {
                 name: voterName
             };
 
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newVoter)
-            };
-
-            fetch(`/api/voters/post`, requestOptions)
-                .then(response => response.json())
-                .finally(() => fetchVoterData());
+            actions.addVoter(newVoter);
             console.log('New Voter submitted.')
         }
     };
@@ -77,18 +61,7 @@ export function VotingIndex() {
             let newCandidate = {
                 name: candidateName
             };
-
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newCandidate)
-            };
-
-            fetch(`/api/candidates/post`, requestOptions)
-                .then(response => response.json())
-                .finally(() => fetchCandidateData());
+            actions.addCandidate(newCandidate);
             console.log('New Candidate submitted.')
         }
     };
@@ -101,17 +74,7 @@ export function VotingIndex() {
                 candidateId: candidateId
             };
 
-            const requestOptions = {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newVote)
-            };
-
-            fetch(`/api/votes/post`, requestOptions)
-                .then(response => response.json())
-                .finally(() => { fetchVoterData(); fetchCandidateData(); });
+            actions.addVote(newVote);
             console.log('New Vote submitted.')
         }
     };
@@ -158,4 +121,36 @@ export function VotingIndex() {
             </div>
         </>
     );
-}
+};
+const mapStateToProps = (state) => {
+    console.log(state);
+    return ({
+        voterData: state.getVoters.voters,
+        candidateData: state.getCandidates.candidates,
+        addedVoter: state.addVoter.voter,
+        addedCandidate: state.addCandidate.candidate,
+        addedVote: state.addVote.vote
+    })
+};
+
+ const mapDispatchToProps = (dispatch) => ({
+     actions: {
+         getVoters: () => {
+             dispatch(actionType.getVoters());
+         },
+         getCandidates: () => {
+             dispatch(actionType.getCandidates());
+         },
+         addVoter: (payload) => {
+             dispatch(actionType.addVoter(payload));
+         },
+         addCandidate: (payload) => {
+             dispatch(actionType.addCandidate(payload));
+         },
+         addVote: (payload) => {
+             dispatch(actionType.addVote(payload));
+         }
+     }
+ });
+
+export default connect(mapStateToProps,mapDispatchToProps)(VotingIndex);

@@ -1,13 +1,17 @@
-import "./styles.css";
-import { VotingIndex } from "./component/voting/votingIndex";
+import {Routes,Route, BrowserRouter } from 'react-router-dom';
+import './styles.css';
+import  VotingIndex  from "./component/voting/votingIndex";
 
-export default function App() {
+
+function App() {
   return (
-    <div>
-      <div className="App">
-        <h2>Voting app</h2>
-      </div>
-      <VotingIndex />
-    </div>
+    <BrowserRouter>
+      <Routes>
+              <Route exact path='/' element={<VotingIndex/>} ></Route>
+        </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
+

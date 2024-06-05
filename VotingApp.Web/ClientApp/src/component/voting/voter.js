@@ -55,7 +55,7 @@ export function Voter({ ...props }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.voterData.map((row) => (
+          {props.voterData && (props.voterData.map((row) => (
             <TableRow
               key={row.name}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -75,7 +75,7 @@ export function Voter({ ...props }) {
                 )}
               </TableCell>
             </TableRow>
-          ))}
+          )))}
         </TableBody>
       </Table>
       <AddVoter
